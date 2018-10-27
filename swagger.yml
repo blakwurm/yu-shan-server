@@ -8,7 +8,11 @@ consumes:
 produces:
   - "application/json"
 
-# basePath: "/v1"
+host: api.yu-shan.com
+schemes:
+ - https
+ - http
+basePath: "/v1"
 
 # Paths supported by the server application
 paths:
@@ -16,7 +20,7 @@ paths:
     parameters:
       - $ref: "#/parameters/apikeyParam"
     get:
-      operationId: "entity.read"
+      operationId: "read_entities"
       tags:
         - "Entity"
       summary: "A list of one or many entities as specified by the query"
@@ -25,12 +29,32 @@ paths:
         200:
           $ref: '#/responses/entityResponse'
     put:
-      operationId: "entity.write"
+      operationId: "add_entities"
       tags:
         - "Entity"
       description: "Adds new entities"
       parameters:
-      - $ref: '#/parameters/entityBody'
+        - $ref: '#/parameters/entityBody'
+      responses:
+        200:
+          $ref: '#/responses/entityResponse'
+    post:
+      operationId: "modify_entities"
+      tags: 
+        - "Entity"
+      description: "Modifies entities"
+      parameters:
+        - $ref: '#/parameters/entityBody'
+      responses:
+        200:
+          $ref: '#/responses/entityResponse'
+    delete:
+      operationId: "remove_entities"
+      tags: 
+        - "Entity"
+      description: "Modifies entities"
+      parameters:
+        - $ref: '#/parameters/entityBody'
       responses:
         200:
           $ref: '#/responses/entityResponse'
@@ -38,16 +62,47 @@ paths:
     parameters:
       - $ref: "#/parameters/apikeyParam"
     get:
-      operationId: "relationship.read"
+      operationId: "read_relationships"
       tags:
         - "Relationship"
-      summary: "A list of one or more relationships"
+      summary: "Read a list of relationships"
       description: "Read a list of relationships"
       responses:
         200:
-          description: "Successful read relationships list operation"
-          schema:
-            $ref: '#/responses/relationshipResponse'
+          $ref: '#/responses/relationshipResponse'
+    put:
+      operationId: "add_relationships"
+      tags:
+        - "Relationship"
+      description: "Adds new relationships"
+      summary: "Adds new relationships"
+      parameters:
+        - $ref: '#/parameters/relationshipBody'
+      responses:
+        200:
+          $ref: '#/responses/relationshipResponse'
+    post:
+      operationId: "modify_relationships"
+      tags:
+        - "Relationship"
+      description: "Modify relationships"
+      summary: "Modify relationships"
+      parameters:
+        - $ref: '#/parameters/relationshipBody'
+      responses:
+        200:
+          $ref: '#/responses/relationshipResponse'
+    delete:
+      operationId: "remove_relationships"
+      tags:
+        - "Relationship"
+      description: "Removes relationships"
+      summary: "Removes relationships"
+      parameters:
+        - $ref: '#/parameters/relationshipBody'
+      responses:
+        200:
+          $ref: '#/responses/relationshipResponse'
 
 parameters:
   apikeyParam:
@@ -64,7 +119,16 @@ parameters:
       type: array
       items: 
         $ref: '#/definitions/Entity'
-    
+  relationshipBody:
+    in: "body"
+    name: "body"
+    description: "an array of relationships"
+    required: true
+    schema:
+      type: array
+      items:
+        $ref: '#/definitions/Relationship'
+
 
 responses:
   entityResponse:
@@ -81,7 +145,7 @@ responses:
         error:
           type: string
   relationshipResponse:
-    description: "Response for an entity query or modification"
+    description: "Response for an relationship query or modification"
     schema:
       type: object
       properties:
@@ -121,6 +185,12 @@ definitions:
         $ref: '#/definitions/EntityID'
       property:
         $ref: '#/definitions/EntityID'
+      detail:
+        type: string
+    required:
+      - id
+      - owner
+      - property
   EntityID:
     type: string
   character:
@@ -148,10 +218,3 @@ definitions:
     maximum: 10
        
     
-# Added by API Auto Mocking Plugin
-host: virtserver.swaggerhub.com
-# basePath: /blakwurm/yu-shan/v1
-schemes:
- - https
-# Added by API Auto Mocking Plugin
-basePath: /blakwurm/yu-shan/1.0.0
