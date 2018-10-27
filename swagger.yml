@@ -1,0 +1,157 @@
+swagger: '2.0'
+info:
+  description: Swagger defintion for the Yu-Shan API, part of the Anathema Project
+  version: "1.0.0"
+  title: Yu-Shan API
+consumes:
+  - "application/json"
+produces:
+  - "application/json"
+
+# basePath: "/v1"
+
+# Paths supported by the server application
+paths:
+  /{apikey}/entities:
+    parameters:
+      - $ref: "#/parameters/apikeyParam"
+    get:
+      operationId: "entity.read"
+      tags:
+        - "Entity"
+      summary: "A list of one or many entities as specified by the query"
+      description: "Read a list of entities"
+      responses:
+        200:
+          $ref: '#/responses/entityResponse'
+    put:
+      operationId: "entity.write"
+      tags:
+        - "Entity"
+      description: "Adds new entities"
+      parameters:
+      - $ref: '#/parameters/entityBody'
+      responses:
+        200:
+          $ref: '#/responses/entityResponse'
+  /{apikey}/relationships:
+    parameters:
+      - $ref: "#/parameters/apikeyParam"
+    get:
+      operationId: "relationship.read"
+      tags:
+        - "Relationship"
+      summary: "A list of one or more relationships"
+      description: "Read a list of relationships"
+      responses:
+        200:
+          description: "Successful read relationships list operation"
+          schema:
+            $ref: '#/responses/relationshipResponse'
+
+parameters:
+  apikeyParam:
+    name: apikey
+    in: path
+    required: true
+    type: string
+  entityBody:
+    in: "body"
+    name: "body"
+    description: "An array of mixed entities"
+    required: true
+    schema:
+      type: array
+      items: 
+        $ref: '#/definitions/Entity'
+    
+
+responses:
+  entityResponse:
+    description: "Response for an Entity modification or query request"
+    schema:
+      type: object
+      properties:
+        resp:
+          $ref: '#/definitions/ResultResp'
+        data:
+          type: array
+          items:
+           $ref: '#/definitions/Entity'
+        error:
+          type: string
+  relationshipResponse:
+    description: "Response for an entity query or modification"
+    schema:
+      type: object
+      properties:
+        resp:
+          $ref: '#/definitions/ResultResp'
+        data:
+          type: array
+          items:
+           $ref: '#/definitions/Relationship'
+        error:
+          type: string
+
+definitions:
+  Entity:
+    type: object
+    additionalProperties: true
+    discriminator: category
+    properties:
+      id:
+        $ref: '#/definitions/EntityID'
+      name:
+        type: string
+      description:
+        type: string
+      category:
+        type: string
+    required: 
+      - name
+      - category
+      - id
+  Relationship:
+    type: object
+    properties:
+      id:
+        type: string
+      owner:
+        $ref: '#/definitions/EntityID'
+      property:
+        $ref: '#/definitions/EntityID'
+  EntityID:
+    type: string
+  character:
+    type: object
+    allOf: 
+      - $ref: '#/definitions/Entity'
+      - type: object
+        properties:
+          subcategory:
+            type: string
+  rulebook:
+    $ref: '#/definitions/Entity'
+  rule:
+    allOf:
+      - $ref: '#/definitions/Entity'
+      - type: object
+        properties:
+          subcategory: 
+            type: string
+          
+          
+  ResultResp:
+    type: integer
+    minimum: 0
+    maximum: 10
+       
+    
+# Added by API Auto Mocking Plugin
+host: virtserver.swaggerhub.com
+# basePath: /blakwurm/yu-shan/v1
+schemes:
+ - https
+# Added by API Auto Mocking Plugin
+basePath: /blakwurm/yu-shan/1.0.0
