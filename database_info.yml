@@ -1,0 +1,42 @@
+dbname: database.sqlite
+tables:
+  entities:
+    name: entities
+    indexes:
+      - id
+    columns:
+      - name: id
+        type: TEXT
+      - name: category
+        type: TEXT
+      - name: name
+        type: TEXT
+      - name: description
+        type: TEXT
+      - name: extra
+        type: TEXT
+  relationships:
+    name: relationships
+    indexes:
+      - id
+    columns:
+      - name: id
+        type: TEXT
+      - name: owner
+        type: TEXT
+      - name: property
+        type: TEXT
+      - name: description
+        type: TEXT
+  users:
+    name: users
+    indexes:
+      - email
+      - id
+    columns:
+      - name: email
+        type: TEXT
+      - name: id
+        type: TEXT
+      - name: checksum
+        type: INTEGER

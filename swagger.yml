@@ -11,8 +11,8 @@ produces:
 host: api.yu-shan.com
 schemes:
  - https
- - http
 basePath: "/v1"
+
 
 # Paths supported by the server application
 paths:
@@ -20,7 +20,15 @@ paths:
     parameters:
       - $ref: "#/parameters/apikeyParam"
     get:
-      operationId: "read_entities"
+      security: []
+      operationId: "entities.read"
+      parameters:
+        - $ref: "#/parameters/idsQuery"
+        - $ref: "#/parameters/entityCategoryQuery"
+        - $ref: "#/parameters/nameQuery"
+        - $ref: "#/parameters/descriptionQuery"
+        - $ref: "#/parameters/countQuery"
+        - $ref: "#/parameters/pageQuery"
       tags:
         - "Entity"
       summary: "A list of one or many entities as specified by the query"
@@ -29,7 +37,7 @@ paths:
         200:
           $ref: '#/responses/entityResponse'
     put:
-      operationId: "add_entities"
+      operationId: "entities.add"
       tags:
         - "Entity"
       description: "Adds new entities"
@@ -39,7 +47,7 @@ paths:
         200:
           $ref: '#/responses/entityResponse'
     post:
-      operationId: "modify_entities"
+      operationId: "entities.modify"
       tags: 
         - "Entity"
       description: "Modifies entities"
@@ -49,7 +57,7 @@ paths:
         200:
           $ref: '#/responses/entityResponse'
     delete:
-      operationId: "remove_entities"
+      operationId: "entities.remove"
       tags: 
         - "Entity"
       description: "Modifies entities"
@@ -62,7 +70,15 @@ paths:
     parameters:
       - $ref: "#/parameters/apikeyParam"
     get:
-      operationId: "read_relationships"
+      security: []
+      operationId: "relationships.read"
+      parameters:
+        - $ref: "#/parameters/idsQuery"
+        - $ref: "#/parameters/descriptionQuery"
+        - $ref: "#/parameters/ownerQuery"
+        - $ref: "#/parameters/propertyQuery"
+        - $ref: "#/parameters/countQuery"
+        - $ref: "#/parameters/pageQuery"
       tags:
         - "Relationship"
       summary: "Read a list of relationships"
@@ -71,7 +87,7 @@ paths:
         200:
           $ref: '#/responses/relationshipResponse'
     put:
-      operationId: "add_relationships"
+      operationId: "relationships.add"
       tags:
         - "Relationship"
       description: "Adds new relationships"
@@ -82,7 +98,7 @@ paths:
         200:
           $ref: '#/responses/relationshipResponse'
     post:
-      operationId: "modify_relationships"
+      operationId: "relationships.modify"
       tags:
         - "Relationship"
       description: "Modify relationships"
@@ -93,7 +109,7 @@ paths:
         200:
           $ref: '#/responses/relationshipResponse'
     delete:
-      operationId: "remove_relationships"
+      operationId: "relationships.remove"
       tags:
         - "Relationship"
       description: "Removes relationships"
@@ -103,13 +119,78 @@ paths:
       responses:
         200:
           $ref: '#/responses/relationshipResponse'
+      
+securityDefinitions:
+  basicAuth:
+    type: basic
 
+security:
+  - basicAuth: []
+          
 parameters:
   apikeyParam:
     name: apikey
     in: path
     required: true
     type: string
+  idsQuery:
+    in: query
+    name: "ids"
+    description: "Multiple IDs to be returned. If an ID is not found, its place will contain an empty object. If not included in the query, result will not depend on ID in any way."
+    required: false
+    type: array
+    items:
+      type: string
+    default: []
+  entityCategoryQuery:
+    in: query
+    name: "category"
+    description: "Category of entity to lookup. If not included in the query, result will not depend on Category in any way"
+    required: false
+    type: string
+    default: ""
+  nameQuery:
+    in: query
+    name: "name"
+    description: "Name of entity to lookup. If not included in the query, result will not depend on Name in any way"
+    required: false
+    type: string
+    default: ""
+  descriptionQuery:
+    in: query
+    name: "description"
+    description: "A substring to match against descriptions. Will return when the entire  provided substring matches against a part of the description. If not included in the query, result will not depend on the Description in any way"
+    required: false
+    type: string
+    default: ""
+  ownerQuery:
+    in: query
+    name: "owner"
+    description: "The ID of the owner. Will return all Relationships with this owner"
+    required: false
+    type: string
+    default: ""
+  propertyQuery:
+    in: query
+    name: "property"
+    description: "The ID of the property. Will return all Relationships for whome this is listed as property"
+    required: false
+    type: string
+    default: ""
+  countQuery:
+    in: query
+    name: "count"
+    description: "Number of results to show"
+    required: false
+    type: integer
+    default: 10
+  pageQuery:
+    in: query
+    name: "page"
+    description: "Page number to display. Depentent on count"
+    required: false
+    type: integer
+    default: 1
   entityBody:
     in: "body"
     name: "body"
@@ -128,9 +209,30 @@ parameters:
       type: array
       items:
         $ref: '#/definitions/Relationship'
-
+  loginBody:
+    in: "body"
+    name: "body"
+    description: "Provided credentials for creating a session"
+    required: true
+    schema:
+      type: object
+      required:
+        - email
+        - token
+      properties:
+        email:
+          type: string
+          format: email
+          description: "The user's email"
+        token:
+          type: string
+          description: "The token that was most recently provided for the user via email"
 
 responses:
+  loginCheckResponse:
+    description: "Response indicating logged in status"
+    schema:
+      type: boolean
   entityResponse:
     description: "Response for an Entity modification or query request"
     schema:
@@ -185,7 +287,7 @@ definitions:
         $ref: '#/definitions/EntityID'
       property:
         $ref: '#/definitions/EntityID'
-      detail:
+      description:
         type: string
     required:
       - id
@@ -216,5 +318,3 @@ definitions:
     type: integer
     minimum: 0
     maximum: 10
-       
-    

@@ -1,2 +1,5 @@
 flask
 connexion
+decorator
+pyyaml
+plac
