@@ -1,4 +1,5 @@
 from auth import requires_auth
+from data import addRow
 simple_return = {"resp": 0, "data": [], "error": ""}
 
 @requires_auth
@@ -7,6 +8,8 @@ def remove(apikey, body):
 
 @requires_auth
 def add(apikey, body): 
+    for relationship in body:
+        addRow('relationships', relationship)
     return simple_return
 
 @requires_auth
