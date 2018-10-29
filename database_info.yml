@@ -28,6 +28,8 @@ tables:
         type: TEXT
       - name: description
         type: TEXT
+      - name: user
+        type: TEXT
   users:
     name: users
     indexes:

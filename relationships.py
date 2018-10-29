@@ -1,4 +1,4 @@
-from auth import requires_auth
+from auth import requires_auth, getCurrentUser
 from data import addRows, readRows, buildResponse
 simple_return = {"resp": 0, "data": [], "error": ""}
 
@@ -9,6 +9,11 @@ def remove(apikey, body):
 
 @requires_auth
 def add(apikey, body): 
+    currentUser = getCurrentUser()
+    print('current user is {cu}'.format(cu = currentUser) )
+    for thing in body:
+        thing.update({'user': currentUser})
+    print('body is {a}'.format(a=body))
     return buildResponse(addRows(__tablename, body))
 
 @requires_auth

@@ -47,6 +47,7 @@ def create_db(c):
                     ct=columndata['type']
                 )
             )
+    c.execute('INSERT INTO users VALUES("admin@yu-shan.com", "YUuseADMINADMINADMIN", 123)')
 
 @connector
 def addRows(table_name, things_to_insert, c):
@@ -56,9 +57,11 @@ def addRows(table_name, things_to_insert, c):
         tableinfo = __db_constants__['tables'][table_name]
         new_id = genCheckedID(table_name, keycolumn_for(table_name))
         cols = list(map(lambda a: a['name'], tableinfo['columns']))
-        insertion = pack_data(table_name, thing).update({idfield: new_id}) 
+        insertion = pack_data(table_name, thing)
+        insertion.update({idfield: new_id}) 
         strcols = ', '.join(cols)
         strplc = ':'+', :'.join(cols)
+        print('insertion is {ins}'.format(ins=insertion))
         rrr = c.execute(
             "INSERT INTO {tn} VALUES ({strplc})".format(
                 tn = table_name,
@@ -85,11 +88,12 @@ def pack_data(table_name, thing_to_pack):
     thing_copy = {**thing_to_pack}
     for key in cols:
         value = None
-        if key is 'extra':
+        if key == 'extra':
             value = json.dumps(thing_copy)
         else:
             value = thing_copy.pop(key, None)
         packed.update({key: value})
+    print('packed is {p}, while original is {t}'.format(p=packed, t=thing_to_pack))
     return packed
 
 @connector

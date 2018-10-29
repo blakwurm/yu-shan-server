@@ -8,6 +8,7 @@ Warning: It is recommended to use 'decorator' package to create decorators for
 
 import connexion
 import flask
+from data import addRows, readRows, buildResponse, connection, connector
 
 try:
     from decorator import decorator
@@ -22,7 +23,7 @@ def check_auth(username: str, password: str):
     '''This function is called to check if a username /
     password combination is valid.'''
     print('username is ' + username + ' and password is ' + password)
-    return username == 'admin' and password == 'secret'
+    return username == 'admin@yu-shan.com' and password == 'secret'
 
 
 def authenticate():
@@ -38,3 +39,11 @@ def requires_auth(f: callable, *args, **kwargs):
     if not auth or not check_auth(auth.username, auth.password):
         return authenticate()
     return f(*args, **kwargs)
+
+@connector
+def getCurrentUser(c):
+    auth = flask.request.authorization
+    logged_in = check_auth(auth.username, auth.password)
+    querystring = 'SELECT id FROM users WHERE email = ?'
+    c.execute(querystring, [auth.username])
+    return c.fetchone()[0] if logged_in else ''
