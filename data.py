@@ -139,11 +139,19 @@ def modify(table_name, modifications, c):
     idcolumn = keycolumn_for(table_name)
     idlist = list(map(lambda a: a[idcolumn], modifications))
     existant = read_multiple_ids(table_name, idlist)
+    combo = []
     for old, new in zip_longest(existant, modifications):
         if old:
-            old.update(new)
-    querystring = 'UPDATE {tn} WHERE {idc} = ?'.format(tn = table_name, idc = idcolumn)
-    return existant
+            combo.append({**old, **new})
+    placeholders = _make_update_placeholder(table_name)
+    querystring = 'UPDATE {tn} SET {plc} WHERE {idc} = :{idc}'.format(
+        tn = table_name, idc = idcolumn, plc = placeholders)
+    return querystring
+
+def _make_update_placeholder(table_name):
+    column_names = list(map(lambda a: a['name'], __db_constants__['tables'][table_name]['columns']))
+    placeholders = list(map(lambda a: '{a} = :{a}'.format(a=a), column_names))
+    return ', '.join(placeholders)
 
 def keycolumn_for(table_name):
     return __db_constants__['tables'][table_name]['columns'][0]['name']
