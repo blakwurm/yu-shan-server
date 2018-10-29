@@ -23,12 +23,13 @@ paths:
       security: []
       operationId: "entities.read"
       parameters:
-        - $ref: "#/parameters/idsQuery"
+        - $ref: "#/parameters/idQuery"
         - $ref: "#/parameters/entityCategoryQuery"
         - $ref: "#/parameters/nameQuery"
         - $ref: "#/parameters/descriptionQuery"
         - $ref: "#/parameters/countQuery"
         - $ref: "#/parameters/pageQuery"
+        - $ref: "#/parameters/methodQuery"
       tags:
         - "Entity"
       summary: "A list of one or many entities as specified by the query"
@@ -73,12 +74,13 @@ paths:
       security: []
       operationId: "relationships.read"
       parameters:
-        - $ref: "#/parameters/idsQuery"
+        - $ref: "#/parameters/idQuery"
         - $ref: "#/parameters/descriptionQuery"
         - $ref: "#/parameters/ownerQuery"
         - $ref: "#/parameters/propertyQuery"
         - $ref: "#/parameters/countQuery"
         - $ref: "#/parameters/pageQuery"
+        - $ref: "#/parameters/methodQuery"
       tags:
         - "Relationship"
       summary: "Read a list of relationships"
@@ -133,15 +135,20 @@ parameters:
     in: path
     required: true
     type: string
-  idsQuery:
+  methodQuery:
     in: query
-    name: "ids"
-    description: "Multiple IDs to be returned. If an ID is not found, its place will contain an empty object. If not included in the query, result will not depend on ID in any way."
+    name: method
     required: false
-    type: array
-    items:
-      type: string
-    default: []
+    type: string
+    default: 'or'
+    enum: ['or', 'and']
+  idQuery:
+    in: query
+    name: "id"
+    description: "ID for the entity to search"
+    required: false
+    type: string
+    default: '' 
   entityCategoryQuery:
     in: query
     name: "category"

@@ -3,3 +3,4 @@ connexion
 decorator
 pyyaml
 plac
+python-baseconv
