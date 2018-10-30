@@ -6,7 +6,7 @@ from itertools import zip_longest
 import random
 from baseconv import base62
 import os
-
+from functools import partial
 
 __db_constants__ = {}
 with open('database_info.yml') as infofile:
@@ -75,6 +75,7 @@ def addRows(table_name, things_to_insert, c):
     print("results are {a}".format(a = results))
     return results
 
+
 def only_key(keyname, default):
     def retfn(a):
         return a.get(keyname, default)
@@ -141,13 +142,15 @@ def modify(table_name, modifications, c):
     idlist = list(map(lambda a: a[idcolumn], modifications))
     existant = read_multiple_ids(table_name, idlist)
     combo = []
+    packed = []
     for old, new in zip_longest(existant, modifications):
         if old:
             combo.append({**old, **new})
+    packed = list(map(partial(pack_data, table_name), combo))
     placeholders = _make_update_placeholder(table_name)
     querystring = 'UPDATE {tn} SET {plc} WHERE {idc} = :{idc}'.format(
         tn = table_name, idc = idcolumn, plc = placeholders)
-    return querystring
+    return packed
 
 def _make_update_placeholder(table_name):
     column_names = list(map(lambda a: a['name'], __db_constants__['tables'][table_name]['columns']))
