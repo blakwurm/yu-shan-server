@@ -9,6 +9,10 @@ tables:
         type: TEXT
       - name: category
         type: TEXT
+      - name: subcategory
+        type: TEXT
+      - name: variation
+        type: TEXT
       - name: name
         type: TEXT
       - name: description

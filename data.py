@@ -5,6 +5,7 @@ from contextlib import contextmanager
 from itertools import zip_longest
 import random
 from baseconv import base62
+import os
 
 
 __db_constants__ = {}
@@ -28,26 +29,26 @@ def connector(func):
             return func(*args, **kwds)
     return callConnect
 
-@connector
-def create_db(c):
-    for key, table in __db_constants__['tables'].items():
-        keyrow = table['columns'][0]
-        c.execute(
-            'CREATE TABLE {tn} ({nf} {ft} PRIMARY KEY)'.format(
-                tn=table['name'],
-                nf=keyrow['name'],
-                ft=keyrow['type']
-            )
-        )
-        for columndata in table['columns'][1:]:
+def create_db():
+    os.remove(__db_constants__['dbname'])
+    with connection() as c:
+        for key, table in __db_constants__['tables'].items():
+            keyrow = table['columns'][0]
             c.execute(
-                "ALTER TABLE {tn} ADD COLUMN '{cn}' {ct}".format(
+                'CREATE TABLE {tn} ({nf} {ft} PRIMARY KEY)'.format(
                     tn=table['name'],
-                    cn=columndata['name'], 
-                    ct=columndata['type']
+                    nf=keyrow['name'],
+                    ft=keyrow['type']
                 )
             )
-    c.execute('INSERT INTO users VALUES("admin@yu-shan.com", "YUuseADMINADMINADMIN", 123)')
+            for columndata in table['columns'][1:]:
+                c.execute(
+                    "ALTER TABLE {tn} ADD COLUMN '{cn}' {ct}".format(
+                        tn=table['name'],
+                        cn=columndata['name'], 
+                        ct=columndata['type']
+                    )
+                )
 
 @connector
 def addRows(table_name, things_to_insert, c):
