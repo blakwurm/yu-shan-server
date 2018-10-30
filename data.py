@@ -85,17 +85,19 @@ def cols_for_table_name(table_name):
     return list(map(only_key('name', None) ,__db_constants__['tables'][table_name]['columns']))
 
 def pack_data(table_name, thing_to_pack):
-    cols = cols_for_table_name(table_name)
-    packed = {}
-    thing_copy = {**thing_to_pack}
-    for key in cols:
-        value = None
-        if key == 'extra':
-            value = json.dumps(thing_copy)
-        else:
-            value = thing_copy.pop(key, None)
-        packed.update({key: value})
-    print('packed is {p}, while original is {t}'.format(p=packed, t=thing_to_pack))
+    if thing_to_pack:
+        print('thing is ' + str(thing_to_pack))
+        cols = cols_for_table_name(table_name)
+        packed = {}
+        thing_copy = {**thing_to_pack}
+        for key in cols:
+            value = None
+            if key == 'extra':
+                value = json.dumps(thing_copy)
+            else:
+                value = thing_copy.pop(key, None)
+            packed.update({key: value})
+        print('packed is {p}, while original is {t}'.format(p=packed, t=thing_to_pack))
     return packed
 
 @connector
@@ -139,18 +141,27 @@ def read_multiple_ids(table_name, idlist):
 @connector
 def modify(table_name, modifications, c):
     idcolumn = keycolumn_for(table_name)
-    idlist = list(map(lambda a: a[idcolumn], modifications))
+    idlist = list(map(lambda a: a.get(idcolumn, None) if a else '', modifications))
     existant = read_multiple_ids(table_name, idlist)
     combo = []
     packed = []
+    results = []
     for old, new in zip_longest(existant, modifications):
-        if old:
+        if old and new:
             combo.append({**old, **new})
+        else:
+            combo.append(None)
     packed = list(map(partial(pack_data, table_name), combo))
     placeholders = _make_update_placeholder(table_name)
     querystring = 'UPDATE {tn} SET {plc} WHERE {idc} = :{idc}'.format(
         tn = table_name, idc = idcolumn, plc = placeholders)
-    return packed
+    for change in packed:
+        if change:
+            c.execute(querystring, change)
+            results.append(change['id'])
+        else:
+            results.append[None]
+    return results
 
 def _make_update_placeholder(table_name):
     column_names = list(map(lambda a: a['name'], __db_constants__['tables'][table_name]['columns']))
