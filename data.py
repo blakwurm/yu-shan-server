@@ -1,7 +1,7 @@
 import sqlite3
 from yaml import load
 import json
-from contextlib import contextmanager
+from contextlib import contextmanager, suppress
 from itertools import zip_longest
 import random
 from baseconv import base62
@@ -18,7 +18,12 @@ with open('database_info.yml') as infofile:
 def connection():
     conn = sqlite3.connect(__db_constants__['dbname'])
     c = conn.cursor()
-    yield c
+    try:
+        yield c
+    except Exception as e:
+        print('There was an exception while connected to the database')
+        conn.close()
+        raise e
     conn.commit()
     conn.close()
 
@@ -85,10 +90,10 @@ def cols_for_table_name(table_name):
     return list(map(only_key('name', None) ,__db_constants__['tables'][table_name]['columns']))
 
 def pack_data(table_name, thing_to_pack):
+    packed = {}
     if thing_to_pack:
         print('thing is ' + str(thing_to_pack))
         cols = cols_for_table_name(table_name)
-        packed = {}
         thing_copy = {**thing_to_pack}
         for key in cols:
             value = None
@@ -98,7 +103,7 @@ def pack_data(table_name, thing_to_pack):
                 value = thing_copy.pop(key, None)
             packed.update({key: value})
         print('packed is {p}, while original is {t}'.format(p=packed, t=thing_to_pack))
-    return packed
+    return None if packed is {} else packed
 
 @connector
 def readRows(table_name, queries, c):
@@ -139,7 +144,7 @@ def read_multiple_ids(table_name, idlist):
     return list(map(lambda a: first(readRows(table_name, {idcolumn: a})), idlist))
 
 @connector
-def modify(table_name, modifications, c):
+def modifyRows(table_name, modifications, c):
     idcolumn = keycolumn_for(table_name)
     idlist = list(map(lambda a: a.get(idcolumn, None) if a else '', modifications))
     existant = read_multiple_ids(table_name, idlist)
@@ -155,12 +160,15 @@ def modify(table_name, modifications, c):
     placeholders = _make_update_placeholder(table_name)
     querystring = 'UPDATE {tn} SET {plc} WHERE {idc} = :{idc}'.format(
         tn = table_name, idc = idcolumn, plc = placeholders)
+    print('packed is {a}'.format(a=packed))
     for change in packed:
         if change:
             c.execute(querystring, change)
             results.append(change['id'])
         else:
-            results.append[None]
+            print('doin else with {a}'.format(a=change))
+            print('results is {a}'.format(a=results))
+            results.append(None)
     return results
 
 def _make_update_placeholder(table_name):
@@ -171,6 +179,19 @@ def _make_update_placeholder(table_name):
 def keycolumn_for(table_name):
     return __db_constants__['tables'][table_name]['columns'][0]['name']
         
+@connector
+def deleteRow(table_name, entity_to_delete, c):
+    cols = cols_for_table_name(table_name)
+    keycol = keycolumn_for(table_name)
+    original_entity = readRows(table_name, entity_to_delete)[0]
+    actually_delete = original_entity == entity_to_delete
+    if actually_delete:
+        c.execute('DELETE FROM {tn} WHERE {kc} = :{kc}'.format(tn=table_name, kc=keycol),
+                  original_entity) 
+        return original_entity[keycol]
+    else:
+        return None
+   
 @connector
 def genCheckedID(table_name, idfield, c):
     ret_id = None

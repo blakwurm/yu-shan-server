@@ -61,9 +61,9 @@ paths:
       operationId: "entities.remove"
       tags: 
         - "Entity"
-      description: "Modifies entities"
+      description: "Deletes an entity. The parameter *must* be exactly identical to the existant entry on the server"
       parameters:
-        - $ref: '#/parameters/entityBody'
+        - $ref: '#/parameters/entityDeleteBody'
       responses:
         200:
           $ref: '#/responses/entityResponse'
@@ -117,7 +117,7 @@ paths:
       description: "Removes relationships"
       summary: "Removes relationships"
       parameters:
-        - $ref: '#/parameters/relationshipBody'
+        - $ref: '#/parameters/relationshipDeleteBody'
       responses:
         200:
           $ref: '#/responses/relationshipResponse'
@@ -207,6 +207,13 @@ parameters:
       type: array
       items: 
         $ref: '#/definitions/Entity'
+  entityDeleteBody:
+    in: body
+    name: body
+    description: "A single entity to delete"
+    required: true
+    schema:
+      $ref: '#/definitions/Entity'
   relationshipBody:
     in: "body"
     name: "body"
@@ -216,6 +223,13 @@ parameters:
       type: array
       items:
         $ref: '#/definitions/Relationship'
+  relationshipDeleteBody:
+    in: body
+    name: body
+    description: "A single entity to delete"
+    required: true
+    schema:
+      $ref: '#/definitions/Relationship'
   loginBody:
     in: "body"
     name: "body"
