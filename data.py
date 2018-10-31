@@ -183,8 +183,11 @@ def keycolumn_for(table_name):
 def deleteRow(table_name, entity_to_delete, c):
     cols = cols_for_table_name(table_name)
     keycol = keycolumn_for(table_name)
-    original_entity = readRows(table_name, entity_to_delete)[0]
+    read_results = readRows(table_name, entity_to_delete)
+    original_entity = read_results[0] if read_results else {}
     actually_delete = original_entity == entity_to_delete
+    print('we should delete {a}'.format(a=entity_to_delete))
+    print('it will delete {a}'.format(a=original_entity))
     if actually_delete:
         c.execute('DELETE FROM {tn} WHERE {kc} = :{kc}'.format(tn=table_name, kc=keycol),
                   original_entity) 
