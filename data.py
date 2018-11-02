@@ -111,6 +111,7 @@ def readRows(table_name, queries, c):
     for key in cols:
         if queries.get(key, None):
             safe_query_keys.append(key)
+    print('queries are {a}'.format(a=queries))
     querymethod = ' AND ' if method is 'and' else ' OR '
     queryplug = querymethod.join(list(map(lambda a: '{a} = :{a}'.format(a = a), safe_query_keys)))
     querystring = "SELECT * FROM {tn} WHERE {qp} LIMIT {limit} OFFSET {offset}".format(
@@ -119,6 +120,7 @@ def readRows(table_name, queries, c):
         limit = count,
         offset = (page - 1) * count
     )
+    print('querystring is ' + querystring)
     c.execute(querystring, queries)
     all_rows = c.fetchall()
     ret_rows = []
