@@ -135,12 +135,13 @@ parameters:
     in: path
     required: true
     type: string
+    default: 'publius'
   methodQuery:
     in: query
     name: method
     required: false
     type: string
-    default: 'or'
+    default: 'and'
     enum: ['or', 'and']
   idQuery:
     in: query
@@ -155,7 +156,8 @@ parameters:
     description: "Category of entity to lookup. If not included in the query, result will not depend on Category in any way"
     required: false
     type: string
-    default: ""
+    default: "rulebook"
+    enum: ['rulebook', 'character', 'rule', 'user']
   nameQuery:
     in: query
     name: "name"

@@ -16,14 +16,7 @@ def add(apikey, body):
 def modify(apikey, body):
     return buildResponse(modifyRows('entities', body))
 
-def read(apikey, id=None, category=None, name=None, description=None, count=None, page=None, method='and'):
-    result = readRows(__tablename,
-    {
-        'id': id,
-        'name': name,
-        'description': description,
-        'count': count,
-        'page': page,
-        'method': method
-    })
+def read(apikey, id='*', category=None, name=None, description=None, count=10, page=1, method='and'):
+    args = locals()
+    result = readRows(__tablename, args)
     return buildResponse(result)

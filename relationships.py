@@ -20,15 +20,7 @@ def add(apikey, body):
 def modify(apikey, body):
     return buildResponse(modifyRows('relationships', body))
 
-def read(apikey, id=None, description=None, owner=None, _property=None, count=None, page=None, method='and'):
-    result = readRows(__tablename,
-    {
-        'id': id,
-        'owner': owner,
-        'property': _property,
-        'description': description,
-        'count': count,
-        'page': page,
-        'method': method
-    })
+def read(apikey, id='*', description=None, owner=None, _property=None, count=None, page=None, method='and'):
+    args = locals()
+    result = readRows(__tablename, args)
     return buildResponse(result)

@@ -119,9 +119,10 @@ def readRows(table_name, queries, c):
     print('queries are {a}'.format(a=queries))
     querymethod = ' AND ' if method is 'and' else ' OR '
     queryplug = querymethod.join(list(map(lambda a: '{a} = :{a}'.format(a = a), safe_query_keys)))
-    querystring = "SELECT * FROM {tn} WHERE {qp} LIMIT {limit} OFFSET {offset}".format(
+    querystring = "SELECT * FROM {tn} {where} {qp} LIMIT {limit} OFFSET {offset}".format(
         tn = table_name,
         qp = queryplug,
+        where = 'WHERE' if queryplug else '',
         limit = count,
         offset = (page - 1) * count
     )
