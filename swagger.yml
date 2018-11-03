@@ -16,6 +16,36 @@ basePath: "/v1"
 
 # Paths supported by the server application
 paths:
+  /{apikey}/users:
+    parameters:
+      - $ref: "#/parameters/apikeyParam"
+    put:
+      operationId: "users.new"
+      tags:
+        - "User"
+      summary: "Create a new user given the login and password"
+      description: "Creates a new entity using the provided auth information"
+      responses:
+        200:
+          $ref: '#/responses/userResponse'
+    get:
+      operationId: "users.check"
+      tags:
+        - "User"
+      summary: "Allows the user to get their ID"
+      description: "Given authentication, returns the user's player object ID"
+      responses:
+        200:
+          $ref: '#/responses/userResponse'
+    post:
+      operationId: "users.reset"
+      tags:
+        - "User"
+      summary: "Resets the password for a given account"
+      description: "Resets the users' password to what's provided in the body, and sends a reset email if auth fails"
+      parameters:
+        - $ref: "#/parameters/passwordResetBody" 
+
   /{apikey}/entities:
     parameters:
       - $ref: "#/parameters/apikeyParam"
@@ -67,6 +97,7 @@ paths:
       responses:
         200:
           $ref: '#/responses/entityResponse'
+
   /{apikey}/relationships:
     parameters:
       - $ref: "#/parameters/apikeyParam"
@@ -232,26 +263,28 @@ parameters:
     required: true
     schema:
       $ref: '#/definitions/Relationship'
-  loginBody:
-    in: "body"
-    name: "body"
-    description: "Provided credentials for creating a session"
+  passwordResetBody:
+    in: body
+    name: newpassword
     required: true
     schema:
-      type: object
-      required:
-        - email
-        - token
-      properties:
-        email:
-          type: string
-          format: email
-          description: "The user's email"
-        token:
-          type: string
-          description: "The token that was most recently provided for the user via email"
+      type: string
+    description: "Used as a new password, if auth succeeds. If auth fails, this value is discarded and an email is sent asking for the user to provide a new password."
 
 responses:
+  userResponse:
+    description: "Response indicating success of a user request"
+    schema:
+      type: object
+      properties:
+        resp:
+          $ref: '#/definitions/ResultResp'
+        data:
+          type: array
+          items:
+            $ref: "#/definitions/EntityID"
+        error:
+          type: string
   loginCheckResponse:
     description: "Response indicating logged in status"
     schema:

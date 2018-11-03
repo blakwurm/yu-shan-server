@@ -22,6 +22,7 @@ except ImportError:
 def check_auth(username: str, password: str):
     '''This function is called to check if a username /
     password combination is valid.'''
+    currentUser = getCurrentUser()
     print('username is ' + username + ' and password is ' + password)
     return username == 'admin@yu-shan.com' and password == 'secret'
 

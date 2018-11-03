@@ -5,7 +5,7 @@ simple_return = {"resp": 0, "data": [], "error": ""}
 __tablename = 'relationships'
 @requires_auth
 def remove(apikey, body):
-    return buildResponse(deleteRow('entities', body))
+    return buildResponse(deleteRow(__tablename, body))
 
 @requires_auth
 def add(apikey, body): 
@@ -18,7 +18,7 @@ def add(apikey, body):
 
 @requires_auth
 def modify(apikey, body):
-    return buildResponse(modifyRows('relationships', body))
+    return buildResponse(modifyRows(__tablename, body))
 
 def read(apikey, id='*', description=None, owner=None, _property=None, count=None, page=None, method='and'):
     args = locals()

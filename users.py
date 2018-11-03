@@ -6,17 +6,18 @@ __tablename = 'entities'
 
 @requires_auth
 def remove(apikey, body):
-    return buildResponse(deleteRow(__tablename, body))
+    return buildResponse(deleteRow('entities', body))
 
 @requires_auth
-def add(apikey, body): 
+def new(apikey): 
     return buildResponse(addRows(__tablename, body))
 
 @requires_auth
-def modify(apikey, body):
-    return buildResponse(modifyRows(__tablename, body))
+def reset(apikey, body):
+    return buildResponse(modifyRows('entities', body))
 
-def read(apikey, id='*', category=None, name=None, description=None, count=10, page=1, method='and'):
+@requires_auth
+def check(apikey):
     args = locals()
     result = readRows(__tablename, args)
     return buildResponse(result)
