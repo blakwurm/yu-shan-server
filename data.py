@@ -56,7 +56,7 @@ def create_db():
                 )
 
 @connector
-def addRows(table_name, things_to_insert, c):
+def addRows(table_name, things_to_insert, *, genNewID = True, c):
     results = []
     idfield = keycolumn_for(table_name)
     for thing in things_to_insert:
@@ -64,7 +64,8 @@ def addRows(table_name, things_to_insert, c):
         new_id = genCheckedID(table_name, keycolumn_for(table_name))
         cols = list(map(lambda a: a['name'], tableinfo['columns']))
         insertion = pack_data(table_name, thing)
-        insertion.update({idfield: new_id}) 
+        if genNewID:
+            insertion.update({idfield: new_id}) 
         strcols = ', '.join(cols)
         strplc = ':'+', :'.join(cols)
         print('insertion is {ins}'.format(ins=insertion))
@@ -91,6 +92,7 @@ def cols_for_table_name(table_name):
 
 def pack_data(table_name, thing_to_pack):
     packed = {}
+    print('we packin {a}'.format(a=thing_to_pack))
     if thing_to_pack:
         print('thing is ' + str(thing_to_pack))
         cols = cols_for_table_name(table_name)

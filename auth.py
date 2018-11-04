@@ -22,7 +22,6 @@ except ImportError:
 def check_auth(username: str, password: str):
     '''This function is called to check if a username /
     password combination is valid.'''
-    currentUser = getCurrentUser()
     print('username is ' + username + ' and password is ' + password)
     return username == 'admin@yu-shan.com' and password == 'secret'
 
@@ -47,11 +46,18 @@ def getCurrentUser(c):
     logged_in = check_auth(auth.username, auth.password)
     return getIDforEmail(auth.username) if logged_in else ''
 
+def getProvidedUsername():
+    return flask.request.authorization.username
+
+def getProvidedPassword():
+    return flask.request.authorization.password
+
 @connector
 def getIDforEmail(email, c):
     if email:
         querystring = 'SELECT id FROM users WHERE email = ?'
-        return c.execute(querystring, [email]).fetchone()[0]
+        res = c.execute(querystring, [email]).fetchone()
+        return res[0]  if res else ''
     else:
         return  ''
 
@@ -69,4 +75,11 @@ def getUserData(*, userID = '', email = '', c):
 
 @connector
 def makeNewUser(email, c):
-    user, entity = getUserData(getCurrentUser())
+    user, entity = getUserData(email = email)
+    if user:
+        return False
+    userID = addRows('entities', [{'category': 'player'}])[0]
+    newuserob = {'email': email, 'id': userID}
+    addRows('users', [newuserob], genNewID=False)
+    return userID
+
