@@ -221,5 +221,9 @@ def genID(table_name):
 def random64():
     return base62.encode(random.randint(9, 999999999999999999999999))
 
-def buildResponse(datalist):
-    return {'resp': 0, 'error': '', 'data': datalist}
+def buildResponse(datalist, *, errors = {}):
+    errorcode, errormessage = errors.get(datalist, (0, ''))
+    real_list = datalist if isinstance(datalist, list) else [datalist]
+    return {'resp': errorcode, 'error': errormessage, 'data': real_list}
+
+non_imp_response = {'resp': -1, 'error': 'Functionality not Implimented', 'data': []}

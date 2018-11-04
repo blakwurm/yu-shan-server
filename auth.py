@@ -24,7 +24,8 @@ def check_auth(username: str, password: str):
     '''This function is called to check if a username /
     password combination is valid.'''
     print('username is ' + username + ' and password is ' + password)
-    user, entity = getUserData(email = getProvidedUsername())
+    existID = getIDforEmail(username)
+    user, entity = getUserData(userID = existID)
     password = getProvidedPassword()
     return hasher.verify(password, user['check'])
 
@@ -60,15 +61,15 @@ def getIDforEmail(email, c):
     if email:
         querystring = 'SELECT id FROM users WHERE email = ?'
         res = c.execute(querystring, [email]).fetchone()
+        print('id for {a} is {b}'.format(a=email, b=res))
         return res[0]  if res else ''
     else:
         return  ''
 
 
 @connector
-def getUserData(*, userID = '', email = '', c):
-    the_id = userID if userID else getIDforEmail(email)
-    if the_id:
+def getUserData(*, userID = '', c):
+    if userID:
         userOb = c.execute('SELECT * FROM users WHERE id = ?', [userID]).fetchone()
         entityOb = c.execute('SELECT * FROM entities WHERE id = ?', [userID]).fetchone()
         user = readRows('users', {'id': userID})[0]
@@ -78,8 +79,11 @@ def getUserData(*, userID = '', email = '', c):
 
 @connector
 def makeNewUser(email, newpass, c):
-    user, entity = getUserData(email = email)
+    existID = getIDforEmail(email)
+    user, entity = getUserData(userID = existID)
+    print('user is {a}'.format(a=user))
     if user:
+        print('user exists, man')
         return False
     userID = addRows('entities', [{'category': 'player'}])[0]
     newuserob = {'email': email, 'id': userID, 'check': hasher.hash(newpass)}
