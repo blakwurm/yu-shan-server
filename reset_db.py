@@ -1,8 +1,10 @@
 import data
+import auth
 import contextlib
+import time
 
-def main():
-    with contextlib.suppress(Exception):
+def main(adminpass):
+    with data.connection() as c:
         data.create_db()
     entities = data.addRows('entities',
     [ 
@@ -14,22 +16,19 @@ def main():
          'category': 'character',
          'subcategory': 'simple',
          'variation': 'USB'},
-         {'name': 'lacking'},
-         {'name': 'admin',
-          'category': 'user',
-          'description': 'the admin account'}
+         {'name': 'lacking'}
     ])
-    with data.connection() as c:
-        c.execute('INSERT INTO users VALUES("admin@yu-shan.com", ?, 123)', [entities[3]])
+
+    adminID = auth.makeNewUser(email = 'admin@yu-shan.com', newpass = adminpass)
 
     relationships = data.addRows('relationships',
     [
         {'owner': entities[1],
          'property': entities[0],
-         'user': entities[3]},
-        {'owner': entities[3],
+         'user': adminID},
+        {'owner': adminID,
          'property': entities[1],
-         'user': entities[3]}
+         'user': adminID}
     ])
 
 if __name__ == '__main__':

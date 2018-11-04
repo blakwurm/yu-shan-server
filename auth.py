@@ -9,6 +9,7 @@ Warning: It is recommended to use 'decorator' package to create decorators for
 import connexion
 import flask
 from data import addRows, readRows, buildResponse, connection, connector
+from passlib.hash import pbkdf2_sha256 as hasher
 
 try:
     from decorator import decorator
@@ -23,7 +24,9 @@ def check_auth(username: str, password: str):
     '''This function is called to check if a username /
     password combination is valid.'''
     print('username is ' + username + ' and password is ' + password)
-    return username == 'admin@yu-shan.com' and password == 'secret'
+    user, entity = getUserData(email = getProvidedUsername())
+    password = getProvidedPassword()
+    return hasher.verify(password, user['check'])
 
 
 def authenticate():
@@ -74,12 +77,15 @@ def getUserData(*, userID = '', email = '', c):
     return ('', '')
 
 @connector
-def makeNewUser(email, c):
+def makeNewUser(email, newpass, c):
     user, entity = getUserData(email = email)
     if user:
         return False
     userID = addRows('entities', [{'category': 'player'}])[0]
-    newuserob = {'email': email, 'id': userID}
+    newuserob = {'email': email, 'id': userID, 'check': hasher.hash(newpass)}
     addRows('users', [newuserob], genNewID=False)
     return userID
 
+hashPass = hasher.hash
+
+verifyPass = hasher.verify

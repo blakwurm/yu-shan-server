@@ -4,3 +4,4 @@ decorator
 pyyaml
 plac
 python-baseconv
+passlib

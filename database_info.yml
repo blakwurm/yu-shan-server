@@ -44,5 +44,5 @@ tables:
         type: TEXT
       - name: id
         type: TEXT
-      - name: checksum
-        type: INTEGER
+      - name: check
+        type: TEXT
