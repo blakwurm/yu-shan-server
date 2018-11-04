@@ -45,6 +45,28 @@ def requires_auth(f: callable, *args, **kwargs):
 def getCurrentUser(c):
     auth = flask.request.authorization
     logged_in = check_auth(auth.username, auth.password)
-    querystring = 'SELECT id FROM users WHERE email = ?'
-    c.execute(querystring, [auth.username])
-    return c.fetchone()[0] if logged_in else ''
+    return getIDforEmail(auth.username) if logged_in else ''
+
+@connector
+def getIDforEmail(email, c):
+    if email:
+        querystring = 'SELECT id FROM users WHERE email = ?'
+        return c.execute(querystring, [email]).fetchone()[0]
+    else:
+        return  ''
+
+
+@connector
+def getUserData(*, userID = '', email = '', c):
+    the_id = userID if userID else getIDforEmail(email)
+    if the_id:
+        userOb = c.execute('SELECT * FROM users WHERE id = ?', [userID]).fetchone()
+        entityOb = c.execute('SELECT * FROM entities WHERE id = ?', [userID]).fetchone()
+        user = readRows('users', {'id': userID})[0]
+        entity = readRows('entities', {'id': userID})[0]
+        return (user, entity)
+    return ('', '')
+
+@connector
+def makeNewUser(email, c):
+    user, entity = getUserData(getCurrentUser())

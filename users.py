@@ -2,11 +2,11 @@ from auth import requires_auth
 from data import addRows, readRows, modifyRows, deleteRow, buildResponse
 simple_return = {"resp": 0, "data": [], "error": ""}
 
-__tablename = 'entities'
+__tablename = 'users'
 
 @requires_auth
 def remove(apikey, body):
-    return buildResponse(deleteRow('entities', body))
+    return buildResponse(deleteRow(__tablename, body))
 
 @requires_auth
 def new(apikey): 
@@ -14,7 +14,7 @@ def new(apikey):
 
 @requires_auth
 def reset(apikey, body):
-    return buildResponse(modifyRows('entities', body))
+    return buildResponse(modifyRows(__tablename, body))
 
 @requires_auth
 def check(apikey):

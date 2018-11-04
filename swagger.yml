@@ -45,6 +45,9 @@ paths:
       description: "Resets the users' password to what's provided in the body, and sends a reset email if auth fails"
       parameters:
         - $ref: "#/parameters/passwordResetBody" 
+      responses:
+        200:
+          $ref: "#/responses/userResponse"
 
   /{apikey}/entities:
     parameters:
