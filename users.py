@@ -17,7 +17,7 @@ def new(apikey):
     return buildResponse(makeNewUser(email = email, newpass = password), errors = errors)
 
 @requires_auth
-def reset(apikey, body):
+def reset(apikey, newpassword):
     return data.non_imp_response
 
 @requires_auth

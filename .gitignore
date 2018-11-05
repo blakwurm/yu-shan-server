@@ -1,5 +1,5 @@
 # SQ Stuff
-*.sqlite
+*.sqlite*
 *.sql
 
 # Scratch file

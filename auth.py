@@ -86,10 +86,16 @@ def makeNewUser(email, newpass, c):
         print('user exists, man')
         return False
     userID = addRows('entities', [{'category': 'player'}])[0]
-    newuserob = {'email': email, 'id': userID, 'check': hasher.hash(newpass)}
+    newuserob = {'email': email, 'id': userID, 'check': hasher.hash(newpass), 'verified': 0}
     addRows('users', [newuserob], genNewID=False)
     return userID
 
 hashPass = hasher.hash
 
 verifyPass = hasher.verify
+
+@connector
+def canUserModifyEntity(userID, entityID, c):
+    # c.execute("SELECT * FROM relationships WHERE user = ? AND property = ?", [userID, entityID])
+    thing = readRows('relationships', {'user': userID, 'property': entityID})
+    return thing[0] if thing else False
