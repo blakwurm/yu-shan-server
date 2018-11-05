@@ -6,6 +6,8 @@ from email.mime.text import MIMEText
 
 emailusername, emailpassword = creds.getCredsFor('email')
 
+mailqueue = []
+
 @contextmanager
 def emailConnection():
     server = smtplib.SMTP('smtp.gmail.com', 587)
@@ -30,3 +32,6 @@ def sendMessage(*, to, subject, body):
         msg.attach(MIMEText(body, 'html'))
         server.send_message(msg) 
         del msg
+
+def addToSendQueue(*, to, subject, body):
+    pass
