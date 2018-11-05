@@ -96,6 +96,31 @@ verifyPass = hasher.verify
 
 @connector
 def canUserModifyEntity(userID, entityID, c):
-    # c.execute("SELECT * FROM relationships WHERE user = ? AND property = ?", [userID, entityID])
-    thing = readRows('relationships', {'user': userID, 'property': entityID})
-    return thing[0] if thing else False
+    if userID and entityID:
+        thing = readRows('relationships', {'owner': userID, 'property': entityID})
+        return thing[0] if thing else False
+    else:
+        return None
+
+@connector
+def canUserModifyRelationship(userID, relationshipID, c):
+    if userID and relationshipID:
+        thing = readRows('relationships', {'owner': userID, 'id': relationshipID})
+        return thing[0] if thing else False
+    else:
+        return None
+
+def indicatesOwnership(relationship):
+    owner = relationship.get('owner', None)
+    user = relationship.get('user', None)
+    return owner == user and owner
+
+@connector
+def claimEntity(userID, entityID, c):
+    """Claims an entity for the provided userID, provided its not already claimed"""
+    existantRelationships = readRows('relationships', {'property': entityID})
+    ownership = [x for x in existantRelationships if indicatesOwnership(x)]
+    if ownership:
+        return False
+    else:
+        return addRows('relationships', [{'owner': userID, 'user': userID, 'property': entityID}])
