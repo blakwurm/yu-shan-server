@@ -222,8 +222,16 @@ def random64():
     return base62.encode(random.randint(9, 999999999999999999999999))
 
 def buildResponse(datalist, *, errors = {}):
-    errorcode, errormessage = errors.get(datalist, (0, ''))
     real_list = datalist if isinstance(datalist, list) else [datalist]
+    def getErrorCode(thingy):
+        try:
+            return errors[thingy]
+        except:
+            return (0, '')
+    codes = [getErrorCode(x) for x in real_list]
+    error_results = [x for x in codes if x[0]]
+    errorcode, errormessage = error_results[0] if error_results else (0, '')
+    print(error_results)
     return {'resp': errorcode, 'error': errormessage, 'data': real_list}
 
 non_imp_response = {'resp': -1, 'error': 'Functionality not Implimented', 'data': []}

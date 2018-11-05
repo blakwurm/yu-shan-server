@@ -1,4 +1,5 @@
-from auth import requires_auth
+from auth import requires_auth 
+import auth
 from data import addRows, readRows, modifyRows, deleteRow, buildResponse
 simple_return = {"resp": 0, "data": [], "error": ""}
 
@@ -10,7 +11,10 @@ def remove(apikey, body):
 
 @requires_auth
 def add(apikey, body): 
-    return buildResponse(addRows(__tablename, body))
+    additions = addRows(__tablename, body)
+    userID = auth.getIDforEmail(auth.getProvidedUsername())
+    [auth.claimEntity(userID, x) for x in additions]
+    return buildResponse(additions)
 
 @requires_auth
 def modify(apikey, body):
