@@ -48,3 +48,12 @@ tables:
         type: TEXT
       - name: verified
         type: INTEGER
+  permissions:
+    name: permissions
+    columns:
+      - name: entityID
+        type: TEXT
+      - name: owner
+        type: TEXT
+      - name: extra
+        type: TEXT
