@@ -49,6 +49,28 @@ paths:
         200:
           $ref: "#/responses/userResponse"
 
+  /{apikey}/entities/search:
+    parameters:
+      - $ref: "#/parameters/apikeyParam"
+    get:
+      security: []
+      operationId: "entities.read"
+      parameters:
+        - $ref: "#/parameters/idQuery"
+        - $ref: "#/parameters/entityCategoryQuery"
+        - $ref: "#/parameters/nameQuery"
+        - $ref: "#/parameters/descriptionQuery"
+        - $ref: "#/parameters/countQuery"
+        - $ref: "#/parameters/pageQuery"
+        - $ref: "#/parameters/methodQuery"
+      tags:
+        - "Entity"
+      summary: "A list of one or many entities as specified by the query"
+      description: "Read a list of entities"
+      responses:
+        200:
+          $ref: '#/responses/entityResponse'
+
   /{apikey}/entities:
     parameters:
       - $ref: "#/parameters/apikeyParam"
@@ -162,6 +184,16 @@ securityDefinitions:
 
 security:
   - basicAuth: []
+
+commonParams:
+  entityParams:
+    - $ref: "#/parameters/idQuery"
+    - $ref: "#/parameters/entityCategoryQuery"
+    - $ref: "#/parameters/nameQuery"
+    - $ref: "#/parameters/descriptionQuery"
+    - $ref: "#/parameters/countQuery"
+    - $ref: "#/parameters/pageQuery"
+    - $ref: "#/parameters/methodQuery"
           
 parameters:
   apikeyParam:
