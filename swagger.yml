@@ -185,16 +185,6 @@ securityDefinitions:
 security:
   - basicAuth: []
 
-commonParams:
-  entityParams:
-    - $ref: "#/parameters/idQuery"
-    - $ref: "#/parameters/entityCategoryQuery"
-    - $ref: "#/parameters/nameQuery"
-    - $ref: "#/parameters/descriptionQuery"
-    - $ref: "#/parameters/countQuery"
-    - $ref: "#/parameters/pageQuery"
-    - $ref: "#/parameters/methodQuery"
-          
 parameters:
   apikeyParam:
     name: apikey
