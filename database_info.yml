@@ -48,3 +48,19 @@ tables:
         type: TEXT
       - name: verified
         type: INTEGER
+  owners:
+    name: owners
+    columns:
+      - name: entityID
+        type: TEXT
+      - name: ownerID
+        type: TEXT
+  accessors:
+    name: accessors
+    columns:
+      - name: id
+        type: TEXT
+      - name: userID
+        type: TEXT
+      - name: entityID
+        type: TEXT

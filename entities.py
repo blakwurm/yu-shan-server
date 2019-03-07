@@ -18,6 +18,7 @@ def add(apikey, body):
 
 @requires_auth
 def modify(apikey, body):
+    canmodify = [auth.canUserModifyEntity(auth.getProvidedUsername, x['id']) for x in body]
     return buildResponse(modifyRows(__tablename, body))
 
 def read(apikey, id='*', category=None, name=None, description=None, count=10, page=1, method='and'):
